@@ -50,7 +50,7 @@ const CONFIG = {
 
   // JWT_SECRET is the secret used to sign and verify tokens issued by this
   // application.
-  JWT_SECRET: process.env.TALK_JWT_SECRET || null,
+  JWT_SECRET: "password" || null,
 
   // JWT_SECRETS is used when key rotation is available.
   JWT_SECRETS: process.env.TALK_JWT_SECRETS || null,
@@ -81,7 +81,7 @@ const CONFIG = {
   // JWT_AUDIENCE is the value for the audience claim for the tokens that will be
   // verified when decoding. If `JWT_AUDIENCE` is not in the environment, then it
   // will default to `talk`.
-  JWT_AUDIENCE: process.env.TALK_JWT_AUDIENCE || 'talk',
+  JWT_AUDIENCE: "ign-comments" || 'talk',
 
   // JWT_DISABLE_ISSUER when TRUE will disable the issuer claim (iss) from tokens.
   JWT_DISABLE_ISSUER: process.env.TALK_JWT_DISABLE_ISSUER === 'TRUE',
@@ -89,12 +89,12 @@ const CONFIG = {
   // JWT_USER_ID_CLAIM is the claim which stores the user's id. This may be a deep
   // object delimited using dot notation. Example `user.id` would store it like:
   // {user: {id}} on the claims object. (Default `sub`)
-  JWT_USER_ID_CLAIM: process.env.TALK_JWT_USER_ID_CLAIM || 'sub',
+  JWT_USER_ID_CLAIM: "userId" || 'sub',
 
   // JWT_ISSUER is the value for the issuer for the tokens that will be verified
   // when decoding. If `JWT_ISSUER` is not in the environment, then it will try
   // `TALK_ROOT_URL`, otherwise, it will be undefined.
-  JWT_ISSUER: process.env.TALK_JWT_ISSUER || process.env.TALK_ROOT_URL,
+  JWT_ISSUER: "ign-oyster" || process.env.TALK_ROOT_URL,
 
   // JWT_EXPIRY is the time for which a given token is valid for.
   JWT_EXPIRY: process.env.TALK_JWT_EXPIRY || '1 day',
@@ -122,8 +122,8 @@ const CONFIG = {
   // External database url's
   //------------------------------------------------------------------------------
 
-  MONGO_URL: process.env.TALK_MONGO_URL,
-  REDIS_URL: process.env.TALK_REDIS_URL,
+  MONGO_URL: "mongodb://sfmbpadelapena.local/newtalk",
+  REDIS_URL: "redis://127.0.0.1:6379",
 
   // REDIS_CLIENT_CONFIG is the optional configuration that is merged with the
   // function config to provide deep control of the redis connection beheviour.
@@ -156,12 +156,12 @@ const CONFIG = {
 
   // Port to bind to.
   PORT:
-    process.env.TALK_PORT ||
+    "3000" ||
     process.env.PORT ||
     (process.env.NODE_ENV === 'test' ? '3001' : '3000'),
 
   // The URL for this Talk Instance as viewable from the outside.
-  ROOT_URL: process.env.TALK_ROOT_URL || null,
+  ROOT_URL: "http://127.0.0.1:3000" || null,
 
   // ROOT_URL_MOUNT_PATH when TRUE will extract the pathname from the
   // TALK_ROOT_URL and use it to mount the paths on.
@@ -237,6 +237,7 @@ if (process.env.NODE_ENV === 'test') {
     CONFIG.STATIC_URI = `http://${localAddress}:3001`;
   }
 } else if (!CONFIG.ROOT_URL) {
+  console.log('THIS IS THE ENV', CONFIG);
   throw new Error('TALK_ROOT_URL must be provided');
 }
 

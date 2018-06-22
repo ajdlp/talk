@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const errors = require('../errors');
 const some = require('lodash/some');
 const merge = require('lodash/merge');
+const fetch = require('node-fetch');
 
 const {
   USERS_NEW,
@@ -368,17 +369,23 @@ class UsersService {
    * @param  {Object}   profile - User social/external profile
    * @param  {Function} done    [description]
    */
-  static async findOrCreateExternalUser({ id, provider, displayName }) {
+  static async findOrCreateExternalUser({ id, displayName, provider = 'local' }) {
     let user = await UserModel.findOne({
       profiles: {
         $elemMatch: {
-          id,
-          provider,
+          id
         },
       },
     });
     if (user) {
       return user;
+    }
+
+    let socialStatus = await fetch('http://apis.ign.com/v1.0/social/rest/people/' + id)
+      .then(response => response.status)
+
+    if (await socialStatus != '200') {
+      throw new Error('USER DOES NOT EXIST IN SOCIAL');
     }
 
     // User does not exist and need to be created.

@@ -1,4 +1,6 @@
 const CommentModel = require('../models/comment');
+const UserModel = require('../models/user');
+const AssetModel = require('../models/asset');
 
 const debug = require('debug')('talk:services:comments');
 const ActionsService = require('./actions');
@@ -29,6 +31,33 @@ module.exports = class CommentsService {
         throw errors.ErrParentDoesNotVisible;
       }
     }
+
+    let user = await UserModel.findOne({
+      profiles: {
+        $elemMatch: {
+          id: input.author_id
+        },
+      },
+    });
+
+    let asset = await AssetModel.findOne({url: input.source});
+
+    if (await user) {
+      input.author_id = user.id
+    }
+    else {
+      throw new Error("COMMENT BY NON EXISTENT USER");
+    }
+
+    if (await !asset) {
+      throw new Error("CORRESPONDING ASSET DOES NOT EXIST");
+    }
+
+    if (input.source.indexOf("ign.com/wikis") > -1) {
+      input.asset_id = asset.id
+    }
+
+    delete input.source
 
     // Create the comment in the database.
     const comment = await CommentModel.create(

@@ -59,34 +59,34 @@ module.exports = class AssetsService {
    * @return {Promise}
    */
   static findOrCreateByUrl(url) {
-    // Check the URL to confirm that is in the domain whitelist
-    return Promise.all([
-      DomainList.urlCheck(url),
-      SettingsService.retrieve(),
-    ]).then(([whitelisted, settings]) => {
-      const update = { $setOnInsert: { url } };
+      // Check the URL to confirm that is in the domain whitelist
+      return Promise.all([
+        DomainList.urlCheck(url),
+        SettingsService.retrieve(),
+      ]).then(([whitelisted, settings]) => {
+        const update = { $setOnInsert: { url } };
 
-      if (settings.autoCloseStream) {
-        update.$setOnInsert.closedAt = new Date(
-          Date.now() + settings.closedTimeout * 1000
-        );
-      }
+        if (settings.autoCloseStream) {
+          update.$setOnInsert.closedAt = new Date(
+            Date.now() + settings.closedTimeout * 1000
+          );
+        }
 
-      if (!whitelisted) {
-        return Promise.reject(errors.ErrInvalidAssetURL);
-      } else {
-        return AssetModel.findOneAndUpdate({ url }, update, {
-          // Ensure that if it's new, we return the new object created.
-          new: true,
+        if (!whitelisted) {
+          return Promise.reject(errors.ErrInvalidAssetURL);
+        } else {
+          return AssetModel.findOneAndUpdate({ url }, update, {
+            // Ensure that if it's new, we return the new object created.
+            new: true,
 
-          // Perform an upsert in the event that this doesn't exist.
-          upsert: true,
+            // Perform an upsert in the event that this doesn't exist.
+            upsert: true,
 
-          // Set the default values if not provided based on the mongoose models.
-          setDefaultsOnInsert: true,
-        });
-      }
-    });
+            // Set the default values if not provided based on the mongoose models.
+            setDefaultsOnInsert: true,
+          });
+        }
+      });
   }
 
   /**
